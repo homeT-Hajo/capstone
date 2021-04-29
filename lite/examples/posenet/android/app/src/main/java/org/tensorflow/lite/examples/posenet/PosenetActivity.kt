@@ -50,7 +50,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 
 
-class    PosenetActivity :
+class PosenetActivity :
     Fragment(),
     ActivityCompat.OnRequestPermissionsResultCallback {
 

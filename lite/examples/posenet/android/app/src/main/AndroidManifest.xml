@@ -35,6 +35,9 @@
 
     <activity android:name=".CameraActivity" android:exported="true" />
     <activity android:name=".MainActivity" />
+    <activity android:name=".MainloginActivity" />
+    <activity android:name=".AbdominalActivity"/>
+    <activity android:name=".LowerbodyActivity"/>
 
   </application>
 
