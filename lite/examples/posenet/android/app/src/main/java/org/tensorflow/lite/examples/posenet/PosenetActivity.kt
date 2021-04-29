@@ -30,6 +30,7 @@ import android.media.ImageReader.OnImageAvailableListener
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.*
+import android.text.TextPaint
 import android.util.Log
 import android.util.Range
 import android.util.Size
@@ -318,7 +319,7 @@ class    PosenetActivity :
                 // We don't use a front facing camera in this sample.
                 val cameraDirection = characteristics.get(CameraCharacteristics.LENS_FACING)
                 if (cameraDirection != null &&
-                    cameraDirection == CameraCharacteristics.LENS_FACING_FRONT
+                    cameraDirection == CameraCharacteristics.LENS_FACING_BACK
                 ) {
                     continue
                 }
@@ -475,6 +476,7 @@ class    PosenetActivity :
 
             // Create rotated version for portrait display
             val rotateMatrix = Matrix()
+            rotateMatrix.postScale(-1f, 1f)
             rotateMatrix.postRotate(90.0f)
 
             val rotatedBitmap = Bitmap.createBitmap(
@@ -631,44 +633,52 @@ class    PosenetActivity :
     // [210128]
     private fun drawScore(canvas: Canvas, person: Person, bitmap: Bitmap) {
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
-        val screenWidth: Int
-        val screenHeight: Int
-        val left: Int
-        val top: Int
-        if (canvas.height > canvas.width) {
-            screenWidth = canvas.width
-            screenHeight = canvas.width
-            left = 0
-            top = (canvas.height - canvas.width) / 2
-        } else {
-            screenWidth = canvas.height
-            screenHeight = canvas.height
-            left = (canvas.width - canvas.height) / 2
-            top = 0
+        canvas.drawColor(Color.WHITE);
+
+        if("$ActionFeedback" =="Bad")
+        {
+            canvas.drawColor(Color.WHITE);
+            paint.color= Color.RED
+            canvas.drawCircle(canvas.width / 2f,canvas.height / 2f,canvas.width / 4f,paint)
         }
-        val widthRatio = screenWidth.toFloat() / MODEL_WIDTH
-        val heightRatio = screenHeight.toFloat() / MODEL_HEIGHT
+        else if("$ActionFeedback"=="Normal")
+        {
+            canvas.drawColor(Color.WHITE);
+            paint.color= Color.YELLOW
+            canvas.drawCircle(canvas.width / 2f,canvas.height / 2f,canvas.width / 4f,paint)
+        }
+        else if("$ActionFeedback"=="Good")
+        {
+            canvas.drawColor(Color.WHITE);
+            paint.color= Color.GREEN
+            canvas.drawCircle(canvas.width / 2f,canvas.height / 2f,canvas.width / 4f,paint)
+        }
 
-        paint.color = Color.WHITE
-        paint.textSize = 100.0f
-        paint.strokeWidth = 15.0f
+        val textPaint = TextPaint().apply {
+            color = Color.WHITE
+            textAlign = Paint.Align.CENTER
+            this.textSize = 29f //30부터 noraml 폰트 깨짐
+        }
 
+        val textHeight = textPaint.descent() - textPaint.ascent()
+        val textOffset = (textHeight / 2) - textPaint.descent()
+        val margin = 100F
+
+        var text = "$ActionFeedback"
+        val numOfChars: Int = textPaint.breakText(
+                text,
+                true,
+                canvas.width / 4f * 2 - margin,
+                null
+        )
+        if (text.length > numOfChars){
+            text = text.substring(0, numOfChars) + ".."
+        }
         canvas.drawText(
-            "$ActionFeedback ",
-            (40.0f * widthRatio),
-            (10.0f * heightRatio),
-            paint
+                text,
+                canvas.width / 2f,canvas.height / 2f + textOffset,
+                textPaint
         )
-
-        paint.color = Color.GREEN
-        paint.setARGB(50, 255, 255, 255)
-        canvas.drawCircle(
-            (40.0f * widthRatio),
-            (10.0f * heightRatio),
-            30.0f,
-            paint
-        )
-
         scoreHolder!!.unlockCanvasAndPost(canvas)
     }
 
